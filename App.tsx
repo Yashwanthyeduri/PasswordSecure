@@ -1,20 +1,12 @@
+
 import React, { useState, useEffect } from 'react';
-import { Shield, Key, CheckCircle, BrainCircuit, Lock, Fingerprint, ChevronRight, MessageSquare, ExternalLink, Settings, AlertTriangle } from 'lucide-react';
+// Fix: Import 'Key' icon which was missing and causing a compilation error.
+import { Shield, CheckCircle, BrainCircuit, Lock, Fingerprint, ChevronRight, MessageSquare, ExternalLink, AlertTriangle, Key } from 'lucide-react';
 import PasswordTester from './components/PasswordTester';
 import ComparisonChart from './components/ComparisonChart';
 import InfoSection from './components/InfoSection';
 import SecurityChat from './components/SecurityChat';
 import { getSecurityTip } from './services/gemini';
-
-declare global {
-  interface AIStudio {
-    hasSelectedApiKey: () => Promise<boolean>;
-    openSelectKey: () => Promise<void>;
-  }
-  interface window {
-    aistudio?: AIStudio;
-  }
-}
 
 const App: React.FC = () => {
   const [tip, setTip] = useState<string>('Loading daily security tip...');
@@ -22,15 +14,6 @@ const App: React.FC = () => {
   useEffect(() => {
     getSecurityTip().then(setTip);
   }, []);
-
-  const handleSelectKey = async () => {
-    if (window.aistudio?.openSelectKey) {
-      await window.aistudio.openSelectKey();
-      getSecurityTip().then(setTip);
-    } else {
-      alert("API Key management is handled via the deployment dashboard for this environment.");
-    }
-  };
 
   const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
@@ -58,15 +41,6 @@ const App: React.FC = () => {
               <a href="#recommendations" onClick={(e) => handleScroll(e, 'recommendations')} className="hover:text-blue-400 transition-colors">Best Practices</a>
             </div>
             <div className="flex items-center gap-4">
-              {window.aistudio && (
-                <button 
-                  onClick={handleSelectKey}
-                  title="Change API Key"
-                  className="p-2 text-slate-400 hover:text-white transition-colors"
-                >
-                  <Settings size={20} />
-                </button>
-              )}
               <a 
                 href="#lab" 
                 onClick={(e) => handleScroll(e, 'lab')}
@@ -281,7 +255,6 @@ const App: React.FC = () => {
       <footer className="bg-slate-950 border-t border-slate-900 py-12 text-center text-slate-600 text-sm">
         <p className="flex justify-center items-center gap-4 mb-4">
            <a href="https://ai.google.dev/gemini-api/docs/billing" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 underline">API Billing Info</a>
-           {window.aistudio && <button onClick={handleSelectKey} className="hover:text-blue-400 underline">Update API Key</button>}
         </p>
         <p>&copy; {new Date().getFullYear()} SecurePass Analyst. Built for Educational Purposes.</p>
         <p className="mt-2">Powered by Google Gemini</p>
